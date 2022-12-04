@@ -28,7 +28,8 @@
     "commitizen": "^4.2.5",
     "node-redis-eventbus": "^1.2.1",
     "tsyringe": "^4.7.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "redis": "^2.8.0"
   },
   "repository": {
     "type": "git",
