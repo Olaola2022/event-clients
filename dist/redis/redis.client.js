@@ -29,7 +29,7 @@ let RedisClient = class RedisClient {
         this.eventBus = eventBus;
         this.registeredTopics = [];
         this.syncMessagesQueue = [];
-        console.log("Redis event initialized");
+        console.info("Redis event initialized");
     }
     topics() {
         return this.registeredTopics;
