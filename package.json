@@ -36,6 +36,9 @@
     "type": "git",
     "url": "https://github.com/fdiaz-olagg/event-clients.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
