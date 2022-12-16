@@ -1,0 +1,44 @@
+{
+  "name": "@olagg/events",
+  "version": "0.0.0-development",
+  "description": "",
+  "main": "dist/index",
+  "types": "dist/index",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc --declaration",
+    "semantic-release": "semantic-release --branches main",
+    "commit": "git-cz"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/connect-redis": "^0.0.18",
+    "@types/redis": "^4.0.11",
+    "@types/uuid": "^9.0.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "semantic-release": "^19.0.5",
+    "ts-node": "^10.9.1",
+    "commitizen": "^4.2.5",
+    "typescript": "^4.9.3"
+  },
+  "dependencies": {
+    "node-redis-eventbus": "^1.2.1",
+    "redis": "^2.8.0",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.7.0",
+    "uuid": "^9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fdiaz-olagg/event-clients.git"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

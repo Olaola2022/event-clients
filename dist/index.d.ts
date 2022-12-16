@@ -1,0 +1,12 @@
+import "reflect-metadata";
+import RedisClient from "./redis/redis.client";
+import { EventClient as eventClient } from "./event.client";
+import { EventBus } from "node-redis-eventbus";
+import { Subscribe as _Subscribe } from "./subscriber/subscribe.decorator";
+import { Subscriber as _Subscriber } from "./subscriber/subscriber.decorator";
+export declare const eventContainer: import("tsyringe").DependencyContainer;
+export type EventClient = eventClient;
+export declare const RedisEventBus: typeof EventBus;
+export declare const RedisEventClient: typeof RedisClient;
+export declare const Subscribe: typeof _Subscribe;
+export declare const Subscriber: typeof _Subscriber;
