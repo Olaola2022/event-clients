@@ -37,7 +37,7 @@
     "url": "https://github.com/fdiaz-olagg/event-clients.git"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   },
   "config": {
     "commitizen": {
