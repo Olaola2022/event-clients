@@ -8,9 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -23,10 +20,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const tsyringe_1 = require("tsyringe");
+const node_redis_eventbus_1 = require("node-redis-eventbus");
 const uuid_1 = require("uuid");
 let RedisClient = class RedisClient {
-    constructor(eventBus) {
-        this.eventBus = eventBus;
+    constructor() {
         this.registeredTopics = [];
         this.syncMessagesQueue = [];
         console.info("Redis event initialized");
@@ -37,7 +34,7 @@ let RedisClient = class RedisClient {
     getByName(name) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return this.eventBus.getByName(name);
+                return node_redis_eventbus_1.EventBus.getByName(name);
             }
             catch (_a) {
                 return yield this.register(name);
@@ -88,22 +85,23 @@ let RedisClient = class RedisClient {
             if (!this.syncMessagesQueue.includes(message.uuid))
                 ready = true;
         }
+        console.info("Event ID", message.uuid, "sended to", `${main}.${topic}`);
     }
     close() {
         const main = this.topics().map(topic => topic.split(".")[0]);
         main.forEach(key => {
-            this.eventBus.getByName(key).destory();
+            node_redis_eventbus_1.EventBus.getByName(key).destory();
         });
     }
     register(main) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return this.eventBus.getByName(main);
+                return node_redis_eventbus_1.EventBus.getByName(main);
             }
             catch (_a) {
                 console.info("Event registered:", main);
-                yield this.eventBus.create(main, { url: process.env.REDIS });
-                return this.eventBus.getByName(main);
+                yield node_redis_eventbus_1.EventBus.create(main, { url: process.env.REDIS });
+                return node_redis_eventbus_1.EventBus.getByName(main);
             }
         });
     }
@@ -111,7 +109,6 @@ let RedisClient = class RedisClient {
 RedisClient = __decorate([
     (0, tsyringe_1.injectable)(),
     (0, tsyringe_1.singleton)(),
-    __param(0, (0, tsyringe_1.inject)("EventBus")),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [])
 ], RedisClient);
 exports.default = RedisClient;
