@@ -21,13 +21,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const tsyringe_1 = require("tsyringe");
 const uuid_1 = require("uuid");
-const registeredTopics = [];
+const registeredTopics = new Map();
 class EventBus {
     constructor(name) {
-        registeredTopics.push({ topic: name });
+        registeredTopics.set(name, []);
     }
     static getByName(name) {
-        if (registeredTopics.find(topic => topic.topic === name)) {
+        if (!registeredTopics.get(name) !== undefined) {
             return new EventBus(name);
         }
         else {
@@ -37,16 +37,21 @@ class EventBus {
     static create(name, options) {
         return new EventBus(name);
     }
-    on(topic, callback) {
+    on(main, topic, callback) {
         return new Promise((resolve, reject) => {
-            const ev = registeredTopics.find(t => t.topic === topic);
-            ev.callback = callback;
+            const ev = registeredTopics.get(main).find(t => t.topic === topic);
+            if (!ev) {
+                registeredTopics.get(main).push({ topic, callback });
+            }
+            else {
+                ev.callback = callback;
+            }
             resolve();
         });
     }
-    emit(topic, message) {
+    emit(main, topic, message) {
         console.info("Event ID", message.uuid, "sended to", `${topic}`);
-        const ev = registeredTopics.find(t => t.topic === topic);
+        const ev = registeredTopics.get(main).find(t => t.topic === topic);
         ev === null || ev === void 0 ? void 0 : ev.callback(message);
     }
     destory() {
@@ -67,7 +72,7 @@ let RedisMockClient = class RedisMockClient {
             try {
                 return EventBus.getByName(name);
             }
-            catch (_a) {
+            catch (e) {
                 return yield this.register(name);
             }
         });
@@ -84,8 +89,8 @@ let RedisMockClient = class RedisMockClient {
             const bus = yield this.getByName(main);
             if (!this.registeredTopics.includes(`${main}.${topic}`))
                 this.registeredTopics.push(`${main}.${topic}`);
-            yield bus.on(topic, (message) => __awaiter(this, void 0, void 0, function* () {
-                const payload = JSON.parse(message.toString());
+            yield bus.on(main, topic, (message) => __awaiter(this, void 0, void 0, function* () {
+                const payload = message;
                 //this.repository.insert(payload.uuid, topic);
                 const result = yield callback({ body: JSON.parse(payload.body), topic: `${main}.${topic}` });
                 const index = this.syncMessagesQueue.indexOf(payload.uuid);
@@ -100,23 +105,20 @@ let RedisMockClient = class RedisMockClient {
             uuid: (0, uuid_1.v4)(),
             body: JSON.stringify(payload)
         };
-        this.getByName(main).then(eventBus => eventBus.emit(topic, message));
+        this.getByName(main).then(eventBus => eventBus.emit(main, topic, message));
         console.info("Event ID", message.uuid, "sended to", `${main}.${topic}`);
     }
-    emitSync(main, topic, payload, timeout = 3000) {
-        const message = {
-            uuid: (0, uuid_1.v4)(),
-            body: JSON.stringify(payload)
-        };
-        this.syncMessagesQueue.push(message.uuid);
-        const dueAt = Date.parse(new Date().toISOString()) + timeout;
-        this.getByName(main).then(eventBus => eventBus.emit(topic, message));
-        let ready = false;
-        while (Date.parse(new Date().toISOString()) <= dueAt && !ready) {
-            if (!this.syncMessagesQueue.includes(message.uuid))
-                ready = true;
-        }
-        console.info("Event ID", message.uuid, "sended to", `${main}.${topic}`);
+    emitSync(main, topic, payload, timeout = 5000) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = {
+                uuid: (0, uuid_1.v4)(),
+                body: JSON.stringify(payload)
+            };
+            this.syncMessagesQueue.push(message.uuid);
+            console.info("Event ID", message.uuid, "sended to", `${main}.${topic}`);
+            const ev = registeredTopics.get(main).find(t => t.topic === topic);
+            yield (ev === null || ev === void 0 ? void 0 : ev.callback(message));
+        });
     }
     close() {
         const main = this.topics().map(topic => topic.split(".")[0]);
@@ -131,7 +133,7 @@ let RedisMockClient = class RedisMockClient {
             }
             catch (_a) {
                 console.info("Event registered:", main);
-                yield EventBus.create(main, { url: process.env.REDIS });
+                EventBus.create(main, {});
                 return EventBus.getByName(main);
             }
         });
