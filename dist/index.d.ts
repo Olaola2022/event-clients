@@ -12,3 +12,4 @@ export declare const RedisEventClient: typeof RedisClient;
 export declare const RedisMockedClient: typeof RedisMockClient;
 export declare const Subscribe: typeof _Subscribe;
 export declare const Subscriber: typeof _Subscriber;
+export declare const event: eventClient;

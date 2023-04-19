@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Subscriber = exports.Subscribe = exports.RedisMockedClient = exports.RedisEventClient = exports.RedisEventBus = exports.eventContainer = void 0;
+exports.event = exports.Subscriber = exports.Subscribe = exports.RedisMockedClient = exports.RedisEventClient = exports.RedisEventBus = exports.eventContainer = void 0;
 require("reflect-metadata");
 const redis_client_1 = __importDefault(require("./redis/redis.client"));
 const node_redis_eventbus_1 = require("node-redis-eventbus");
@@ -17,3 +17,4 @@ exports.RedisEventClient = redis_client_1.default;
 exports.RedisMockedClient = redis_mock_1.default;
 exports.Subscribe = subscribe_decorator_1.Subscribe;
 exports.Subscriber = subscriber_decorator_1.Subscriber;
+exports.event = exports.eventContainer.resolve("EventClient");
